@@ -18,6 +18,7 @@ requirements = [
 ]
 
 test_requirements = [
+    'unittest2'
 ]
 
 setup(

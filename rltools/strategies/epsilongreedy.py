@@ -27,7 +27,7 @@ class EpsilonGreedyStrategy(object):
         # 1. action set passed to this function
         # 2. action set passed to initialization of strategy object
         # 3. all actions observed by learner
-        valid_actions = valid_actions or self.valid_actions or self.learner.get_actions()
+        valid_actions = valid_actions or self.valid_actions or list(self.learner.get_actions())
         
         # Every 1/e times, pick random action
         roll = random.random()
