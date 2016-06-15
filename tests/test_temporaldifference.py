@@ -118,7 +118,7 @@ class TestTemporalDifferenceLearner(unittest2.TestCase):
             for i in range(len(u)):
                 td._set_value(i, 0, u[i])
 
-            for i in range(int(5E4)):
+            for i in range(int(1E5)):
                 rnd = random.random()
                 td.fit([
                     (0, 0, 0),
