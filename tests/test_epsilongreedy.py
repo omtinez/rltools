@@ -25,6 +25,14 @@ class TestEpsilonGreedyStrategy(unittest2.TestCase):
     def tearDown(self):
         pass
 
+        
+    def test_000_interface(self):
+        strategy = EpsilonGreedyStrategy(TemporalDifferenceLearner())
+        tup = (0, 0, 0)
+        strategy.fit(tup)
+        strategy.fit([tup])
+        strategy.fit([tup for i in range(10)])
+        strategy.policy(0)
 
     # TODO: Epsilon greedy strategy tests
 
