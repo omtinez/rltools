@@ -102,7 +102,7 @@ class TestTemporalDifferenceLearner(unittest2.TestCase):
             self.assertAlmostEqual(s[i], td.val(i, 0))
 
 
-    @unittest2.skipIf("TRAVIS" in os.environ and os.environ["TRAVIS"] == true, "Skipping this test on Travis CI.")
+    @unittest2.skipIf("TRAVIS" in os.environ and os.environ["TRAVIS"], "Skipping this test on Travis CI.")
     def test_004_td_converge_stockastic(self):
     
         r = [7.9,-5.1,2.5,-7.2,9.0,0.0,1.6]
