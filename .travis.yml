@@ -29,4 +29,4 @@ python:
   - "3.5"
 install: pip install -U unittest2
 language: python
-script: python -m unittest2 discover
+script: python setup.py test
