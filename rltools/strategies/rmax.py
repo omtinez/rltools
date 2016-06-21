@@ -2,8 +2,8 @@ import random
 import pickle
 import numpy as np
 
-from .strategy import Strategy
-from learners import Learner, MLMDP, TemporalDifferenceLearner
+from rltools.strategies import Strategy
+from rltools.learners import Learner, MLMDP, TemporalDifferenceLearner
 
 class RMaxStrategy(Strategy):
 

@@ -1,6 +1,6 @@
 import random
 
-from .strategy import Strategy
+from rltools.strategies import Strategy
 
 class EpsilonGreedyStrategy(Strategy):
     '''

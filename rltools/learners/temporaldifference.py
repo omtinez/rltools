@@ -1,6 +1,6 @@
 import time
 
-from .learner import Learner
+from rltools.learners import Learner
 
 class TemporalDifferenceLearner(Learner):
     '''

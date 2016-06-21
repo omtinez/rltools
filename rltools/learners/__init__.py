@@ -1,4 +1,5 @@
+from .learner import *
 from .temporaldifference import *
 from .mlmpd import *
 
-__all__ = ['TemporalDifferenceLearner', 'MLMDP']
+__all__ = ['Learner', 'TemporalDifferenceLearner', 'MLMDP']

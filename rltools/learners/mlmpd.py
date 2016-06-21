@@ -1,7 +1,7 @@
 import numpy as np
 from mdptoolbox.mdp import PolicyIteration
 
-from .learner import Learner
+from rltools.learners import Learner
 
 class MLMDP(Learner):
     '''
