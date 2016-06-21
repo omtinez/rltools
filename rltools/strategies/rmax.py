@@ -1,9 +1,7 @@
-import random
 import pickle
-import numpy as np
 
 from rltools.strategies import Strategy
-from rltools.learners import Learner, MLMDP, TemporalDifferenceLearner
+from rltools.learners import Learner, MLMDP
 
 class RMaxStrategy(Strategy):
 
@@ -12,9 +10,10 @@ class RMaxStrategy(Strategy):
 
         # Initialize ourselves as an instance of a learner so we can keep track of the states and
         # populate transition counts without relying on the learner
-        Learner.__init__(self)  
+        Learner.__init__(self)  # pylint: disable=non-parent-init-called
 
-        self._confidence = confidence_fn if confidence_fn else lambda c: 1.0 - (1.0 / max(1, c) ** 0.5)
+        self._confidence = confidence_fn if confidence_fn else \
+            lambda c: 1.0 - (1.0 / max(1, c) ** 0.5)
         self._transition_count = {}
         self._max_reward_seen = 0
 
@@ -23,7 +22,7 @@ class RMaxStrategy(Strategy):
         self.optimistic_learner = MLMDP(normalize_count=0)
 
 
-    def _learn_incr(self, prev_state, action, reward, curr_state):
+    def _learn_incr(self, prev_state, action, reward, curr_state):  # pylint: disable=unused-argument
         key = (prev_state, action)
         self._transition_count[key] = self._transition_count.get(key, 0) + 1
 
@@ -43,23 +42,23 @@ class RMaxStrategy(Strategy):
 
         # Save the current state of the optimistic learner
         p_optimistic_learner = pickle.dumps(self.optimistic_learner)
-        
+
         # Update the value of the states estimated by learner based on our confidence and
         # optimistic expectation of unseen transitions
         num_updates = 0
         confidence_atol = 1E-3
         n_states = max(self.optimistic_learner.get_states()) + 1
         n_actions = max(self.optimistic_learner.get_actions()) + 1
-        for a in range(n_actions):
-            for s in range(n_states):
+        for action in range(n_actions):
+            for state_ in range(n_states):
                 confidence = self._confidence(
-                    self._transition_count.get((s, a), 0))
+                    self._transition_count.get((state_, action), 0))
                 if confidence < 1.0 - confidence_atol:
                     num_updates += 1
-                    self.optimistic_learner._last_state = s
+                    self.optimistic_learner._last_state = state_  # pylint: disable=protected-access
                     self.optimistic_learner.fit(
-                        (s, a,  (1.0 - confidence) * self._max_reward_seen))
-       
+                        (state_, action, (1.0 - confidence) * self._max_reward_seen))
+
         # If we are confident enough about all values, no need to solve the MDP
         if num_updates > 0:
             self.optimistic_learner.converge()

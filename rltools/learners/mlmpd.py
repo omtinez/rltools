@@ -8,7 +8,7 @@ class MLMDP(Learner):
     based on the maximum likelihood estimate for the reward and transition functions from the data
     observed.
     '''
-    
+
     def __init__(self, discount_factor=0.86, learning_rate=0.99, normalize_count=None):
         Learner.__init__(self, discount_factor, learning_rate)
         self._transition_count = {}
@@ -23,8 +23,8 @@ class MLMDP(Learner):
 
 
     def _learn_incr(self, prev_state, action, reward, curr_state):
-        ''' Incrementally update the value estimates after observing a transition between states '''
-        
+        ''' Incrementally update value estimates after observing a transition between states '''
+
         key1 = (prev_state, action, curr_state)
         key2 = (prev_state, action)
         self._transition_count[key1] = self._transition_count.get(key1, 0) + 1
@@ -36,8 +36,8 @@ class MLMDP(Learner):
             self._transition_count = {}
             if self.normalize_count_double:
                 self.normalize_count *= 2
-                        
-            
+
+
     def _calc_matrices(self):
         n_states = max(self.get_states()) + 1
         n_actions = max(self.get_actions()) + 1
@@ -45,47 +45,55 @@ class MLMDP(Learner):
         R = np.zeros((n_actions, n_states, n_states))
 
         # Compute the estimated transition probabilities
-        for (s1, a), s_list in self._transition_history.items():
+        for (state1, action), s_list in self._transition_history.items():
             s_count = float(len(s_list))
-            for s2 in s_list:
-                T[a, s1, s2] += 1 / s_count
+            for state2 in s_list:
+                T[action, state1, state2] += 1 / s_count
 
         # Compute the estimated reward value
-        for (s1, a, s2), r_list in self._reward_history.items():
+        for (state1, action, state2), r_list in self._reward_history.items():
             r_count = len(r_list)
-            for r in r_list:
-                R[a, s1, s2] += float(r) / r_count
+            for reward in r_list:
+                R[action, state1, state2] += float(reward) / r_count
 
         # Combine with the prior belief in accordance to the current learning rate
-        for a in range(n_actions):
-            for s1 in range(n_states):
-                for s2 in range(n_states):
+        for action in range(n_actions):
+            for state1 in range(n_states):
+                for state2 in range(n_states):
 
-                    if (s1, a, s2) in self._transition_prior:
-                        T[a, s1, s2] = T[a, s1, s2] * self._learning_rate + \
-                            self._transition_prior.get((s1, a, s2), 0) * (1.0 - self._learning_rate)
-                    if self._max_history_len > 0 and len(self._transition_history) > self._max_history_len:
-                        self._transition_history[(s1, a)] = []
-                        self._transition_prior[(s1, a, s2)] = T[a, s1, s2]
+                    if (state1, action, state2) in self._transition_prior:
+                        T[action, state1, state2] = \
+                            T[action, state1, state2] * self._learning_rate + \
+                                self._transition_prior.get((state1, action, state2), 0) * \
+                                (1.0 - self._learning_rate)
+                    if self._max_history_len > 0 and \
+                        len(self._transition_history) > self._max_history_len:
+                        self._transition_history[(state1, action)] = []
+                        self._transition_prior[(state1, action, state2)] = \
+                            T[action, state1, state2]
 
-                    if (s1, a, s2) in self._reward_prior:
-                        R[a, s1, s2] = R[a, s1, s2] * self._learning_rate + \
-                            self._reward_prior.get((s1, a, s2), 0) * (1.0 - self._learning_rate)
-                    if self._max_history_len > 0 and len(self._reward_history) > self._max_history_len:
-                        self._reward_history[(s1, a, s2)] = []
-                        self._reward_prior[(s1, a, s2)] = R[a, s1, s2]
+                    if (state1, action, state2) in self._reward_prior:
+                        R[action, state1, state2] = \
+                            R[action, state1, state2] * self._learning_rate + \
+                                self._reward_prior.get((state1, action, state2), 0) * \
+                                (1.0 - self._learning_rate)
+                    if self._max_history_len > 0 and \
+                        len(self._reward_history) > self._max_history_len:
+                        self._reward_history[(state1, action, state2)] = []
+                        self._reward_prior[(state1, action, state2)] = R[action, state1, state2]
 
-                        
-        # Make sure that the transition matrix is stochastic by providing uniform weight to unseen transition rows
-        for a in range(n_actions):
-            for s in range(n_states):
-                diff = 1.0 - T[a, s].sum()
+
+        # Make sure that the transition matrix is stochastic by providing uniform weight to unseen
+        # transition rows
+        for action in range(n_actions):
+            for state in range(n_states):
+                diff = 1.0 - T[action, state].sum()
                 if abs(diff) > 1E-3:
-                    T[a, s] += diff / n_states
-                
+                    T[action, state] += diff / n_states
+
         return T, R
-            
-        
+
+
     def converge(self, atol=1E-3, max_iter=1000, max_time=0):
         ''' Train over already fitted data over and over until convergence '''
         T, R = self._calc_matrices()
@@ -94,6 +102,6 @@ class MLMDP(Learner):
 
         n_states = max(self.get_states()) + 1
         n_actions = max(self.get_actions()) + 1
-        for a in range(n_actions):
-            for s in range(n_states):
-                self._set_value(s, a, V[a, s])
+        for action in range(n_actions):
+            for state in range(n_states):
+                self._set_value(state, action, V[action, state])

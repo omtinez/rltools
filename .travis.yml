@@ -21,7 +21,6 @@ deploy:
     repo: omtinez/rltools
     tags: true
 python:
-  - "2.6"
   - "2.7"
   - "3.2"
   - "3.3"

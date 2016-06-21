@@ -13,16 +13,16 @@ class EpsilonGreedyStrategy(Strategy):
         Strategy.__init__(self, learner, valid_actions)
 
 
-    def _epsilon(self, t):
-        return 0.2 / (1 + t/1E3)
+    def _epsilon(self, episode):
+        return 0.2 / (1 + episode / 1E3)
 
 
     def policy(self, state, valid_actions=None):
         valid_actions = self._parse_valid_actions(valid_actions)
-        
+
         # Every 1/e times, pick random action
         roll = random.random()
-        if roll < self._epsilon(self.learner._curr_episode):
+        if roll < self._epsilon(self.learner._curr_episode):  # pylint: disable=protected-access
             return valid_actions[random.randint(0, len(valid_actions) - 1)]
 
         # Otherwise, pick the action with highest value

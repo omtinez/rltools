@@ -9,13 +9,13 @@ Tests for `epsilongreedy` module.
 """
 
 import unittest2
-import random
 
 from rltools.learners import TemporalDifferenceLearner
 from rltools.strategies import EpsilonGreedyStrategy
 
 
 class TestEpsilonGreedyStrategy(unittest2.TestCase):
+    # pylint: disable=protected-access, invalid-name
 
 
     def setUp(self):
@@ -25,7 +25,7 @@ class TestEpsilonGreedyStrategy(unittest2.TestCase):
     def tearDown(self):
         pass
 
-        
+
     def test_000_interface(self):
         strategy = EpsilonGreedyStrategy(TemporalDifferenceLearner())
         tup = (0, 0, 0)

@@ -1,4 +1,4 @@
-from .gridworld import *
-from .randomwalk import *
+from .gridworld import GridWorld
+from .randomwalk import RandomWalk
 
 __all__ = ['GridWorld', 'RandomWalk']

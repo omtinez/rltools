@@ -1,5 +1,5 @@
-from .learner import *
-from .temporaldifference import *
-from .mlmpd import *
+from .learner import Learner
+from .temporaldifference import TemporalDifferenceLearner
+from .mlmpd import MLMDP
 
 __all__ = ['Learner', 'TemporalDifferenceLearner', 'MLMDP']

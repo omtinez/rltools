@@ -8,14 +8,15 @@ test_learner
 Tests for `Learner` interface.
 """
 
-import unittest2
 import random
 import pickle
+import unittest2
 
 from rltools.learners import Learner
 
 
 class TestLearner(unittest2.TestCase):
+    # pylint: disable=protected-access, invalid-name
 
 
     def setUp(self):
@@ -25,7 +26,7 @@ class TestLearner(unittest2.TestCase):
     def tearDown(self):
         pass
 
-        
+
     def test_000_set_value(self):
         learner = self.cls(discount_factor=random.random(), learning_rate=random.random())
         learner._set_value(0, 0, 1)
@@ -33,7 +34,7 @@ class TestLearner(unittest2.TestCase):
         learner._set_value(0, 0, 2)
         self.assertEqual(learner.val(0, 0), 2)
 
-        
+
     def test_001_update_value(self):
         learner = self.cls(discount_factor=random.random(), learning_rate=random.random())
         learner._update_value(0, 0, 1)
@@ -41,7 +42,7 @@ class TestLearner(unittest2.TestCase):
         learner._update_value(0, 0, 1)
         self.assertEqual(learner.val(0, 0), 2)
 
-        
+
     def test_002_update_sets(self):
         learner = self.cls(discount_factor=random.random(), learning_rate=random.random())
         learner._set_value(0, 0, 0)
@@ -50,7 +51,7 @@ class TestLearner(unittest2.TestCase):
         self.assertEqual(learner.get_states(), set([0, 1]))
         self.assertEqual(learner.get_actions(), set([0, 1, 2]))
 
-        
+
     def test_003_copy_values(self):
         learner = self.cls(discount_factor=random.random(), learning_rate=random.random())
         learner._set_value(0, 0, 1)
@@ -58,7 +59,7 @@ class TestLearner(unittest2.TestCase):
         learner._set_value(0, 0, 2)
         self.assertEqual(learner._copy_values(), {(0, 0): 2})
 
-        
+
     def test_004_init_episode(self):
         learning_rate = random.random()
         discount_factor = random.random()
@@ -83,7 +84,8 @@ class TestLearner(unittest2.TestCase):
         learner2.fit((2, 0, 0.5))
         learner2.fit((3, 0, -1))
 
-        self.assertEqual([learner1.val(i, 0) for i in range(4)], [learner2.val(i, 0) for i in range(4)])
+        self.assertEqual([learner1.val(i, 0) for i in range(4)],
+                         [learner2.val(i, 0) for i in range(4)])
 
 
     def test_006_pickle(self):
@@ -104,7 +106,8 @@ class TestLearner(unittest2.TestCase):
         up_learner2.fit((2, 0, 0.5))
         up_learner2.fit((3, 0, -1))
 
-        self.assertTrue(all([learner1.val(i, 0) == up_learner2.val(i, 0) for i in range(4)]))
+        self.assertEqual([learner1.val(i, 0) for i in range(4)],
+                         [up_learner2.val(i, 0) for i in range(4)])
 
 
 if __name__ == '__main__':

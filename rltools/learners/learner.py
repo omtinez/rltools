@@ -5,7 +5,7 @@ class Learner(object):
     '''
     Define interface of methods that must be implemented by all inhereting classes.
     '''
-    
+
     def __init__(self, discount_factor=1, learning_rate=1):
         self._values = {}
         self._prev_values = {}
@@ -17,8 +17,8 @@ class Learner(object):
 
         self._all_states = set()
         self._all_actions = set()
-        
-        
+
+
     def _set_value(self, state, action, val):
         ''' Helper method to override the value of specific <state, action> '''
         self._all_states.add(state)
@@ -63,8 +63,8 @@ class Learner(object):
             Estimated value of the `state` reached after taking `action`.
         '''
         return self._values.get((state, action), 0)
-    
-    
+
+
     def init_episode(self):
         '''
         Called after a terminal state is reached and a new episode is started. This method is
@@ -81,10 +81,10 @@ class Learner(object):
         >>> # The prior line is equivalent to:
         >>> learner.init_episode()
         >>> learner.fit([(0, 0, 0), (2, 0, 0.3), (3, 0, -1)])
-        >>> 
+        >>>
         >>> # A new episode can alternatively be initialized by passing a state with value `None`:
         >>> learner.fit((None, 0, 0))
-        >>> 
+        >>>
         >>> # This also works for passing multiple episodes as a single iterable:
         >>> learner.fit([
         ...     (0, 0, 0), (1, 0, 0.1), (2, 0, 0.5), (3, 0, -1),
@@ -97,11 +97,11 @@ class Learner(object):
         self._last_state = None
 
 
-    def fit(self, X):
+    def fit(self, X):  # pylint: disable=invalid-name
         '''
         Fit the learner with the provided data in the form of <state, action, reward>. The reward
         and action for the first state in an episode are always ignored.
-        
+
         Parameters
         ----------
         X : Tuple of <state, action, reward> or array-like of <state, action, reward>, where
@@ -136,21 +136,21 @@ class Learner(object):
             if self._last_state is None:
                 self.init_episode()
             X = [X]
-            
+
         for (state, action, reward) in X:
             self._all_states.add(state)
             self._all_actions.add(action)
             if self._last_state is not None:
                 self._learn_incr(self._last_state, action, reward, state)
             self._last_state = state
-    
 
-    def _learn_incr(self, prev_state, action, reward, curr_state):
+
+    def _learn_incr(self, prev_state, action, reward, curr_state):  # pylint: disable=unused-argument
         ''' Incrementally update the value estimates after observing a transition between states '''
         self._update_value(prev_state, action, reward * self._learning_rate)
 
 
-    def _value_iteration(self, T, R, atol=1E-3, max_iter=1000, max_time=0):
+    def _value_iteration(self, T, R, atol=1E-3, max_iter=1000, max_time=0):  # pylint: disable=too-many-arguments, invalid-name
         '''
         Given transition matrix T and reward matrix R, compute value of <state, action> vectors
         using value iteration algorithm.
@@ -158,26 +158,28 @@ class Learner(object):
 
         n_states = max(self.get_states()) + 1
         n_actions = max(self.get_actions()) + 1
-        V = np.zeros((n_actions, n_states))
+        curr_values = np.zeros((n_actions, n_states))
 
         # Iterate and increase state values by the discounted adjacent state values
         stopwatch = time.time() + max_time
-        V_prev = V.copy()
-        for i in range(max_iter):
-            for a in range(n_actions):
-                for s1 in range(n_states):
-                    V[a, s1] = (T[a, s1] * R[a, s1]).sum()
-                    for s2 in range(n_states):
-                        V[a, s1] += T[a, s1, s2] * self._discount_factor * V_prev[a, s2]
+        prev_values = curr_values.copy()
+        for i in range(max_iter):  # pylint: disable=unused-variable
+            for action in range(n_actions):
+                for state1 in range(n_states):
+                    curr_values[action, state1] = (T[action, state1] * R[action, state1]).sum()
+                    for state2 in range(n_states):
+                        curr_values[action, state1] += T[action, state1, state2] * \
+                            self._discount_factor * prev_values[action, state2]
 
-            if ((V_prev - V) ** 2).mean() < atol or (max_time > 0 and stopwatch < time.time()):
+            if ((prev_values - curr_values) ** 2).mean() < atol or \
+                (max_time > 0 and stopwatch < time.time()):
                 break
 
-            V_prev = V.copy()
+            prev_values = curr_values.copy()
 
-        return V
-  
-    def converge(self, atol=1E-3, max_iter=1000):
+        return curr_values
+
+    def converge(self, atol=1E-3, max_iter=1000, max_time=0):
         ''' Train over already fitted data over and over until convergence '''
         raise NotImplementedError(
             'Classes inhereting from Learner must override Learner.converge()')

@@ -7,7 +7,7 @@ class Strategy(object):
         self.valid_actions = valid_actions or []
 
 
-    def fit(self, X):
+    def fit(self, X):  # pylint: disable=invalid-name
         self.learner.fit(X)
 
 
@@ -30,7 +30,7 @@ class Strategy(object):
     def _greedy_policy(self, state, valid_actions=None, value_fn=None):
         valid_actions = self._parse_valid_actions(valid_actions)
         value_fn = value_fn or self.learner.val
-        
+
         # Pick the action with highest value
         action_values = [(value_fn(state, action), action) for action in valid_actions]
         sorted_values = sorted(action_values, key=lambda x: -x[0])

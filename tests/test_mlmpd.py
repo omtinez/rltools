@@ -8,9 +8,8 @@ test_mldmp
 Tests for `maximum likelihood MDP` module.
 """
 
-import unittest2
 import random
-import os
+import unittest2
 
 from tests.test_learner import TestLearner
 from rltools.learners import MLMDP
@@ -18,6 +17,7 @@ from rltools.strategies import Strategy
 from rltools.domains import randomwalk
 
 class TestMLMDP(TestLearner):
+    # pylint: disable=protected-access, invalid-name
 
 
     def setUp(self):
@@ -33,7 +33,7 @@ class TestMLMDP(TestLearner):
 
         learner.init_episode()
         learner.fit((0, 0, 0))
-        for i in range(1000):
+        for _ in range(1000):
             learner.fit((1, 1, 10))
             learner.fit((0, 0, 0))
             learner.fit((2, 2, -10))
@@ -55,7 +55,7 @@ class TestMLMDP(TestLearner):
 
         learner.init_episode()
         learner.fit((0, 0, 0))
-        for i in range(1000):
+        for _ in range(1000):
             learner.fit((1, 1, 10 - random.random()))
             learner.fit((0, 0, 0))
             learner.fit((2, 2, -10))
