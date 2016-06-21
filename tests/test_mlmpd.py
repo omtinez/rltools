@@ -12,7 +12,7 @@ import unittest2
 import random
 import os
 
-from .test_learner import TestLearner
+from tests.test_learner import TestLearner
 from rltools.learners import MLMDP
 from rltools.strategies import Strategy
 from rltools.domains import randomwalk

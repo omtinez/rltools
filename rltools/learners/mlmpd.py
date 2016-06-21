@@ -1,5 +1,4 @@
 import numpy as np
-from mdptoolbox.mdp import PolicyIteration
 
 from rltools.learners import Learner
 
