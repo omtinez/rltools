@@ -1,3 +1,9 @@
-from .epsilongreedy import *
+import os
+import sys
 
-__all__ = ['EpsilonGreedyStrategy']
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+
+from .epsilongreedy import *
+from .rmax import *
+
+__all__ = ['EpsilonGreedyStrategy', 'RMaxStrategy']

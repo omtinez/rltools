@@ -40,36 +40,60 @@ class GridWorld(object):
         elif action == 3:  # 3 is down
             moveto = (min(len(self.grid) - 1, coords[0] + 1), coords[1])
 
+        oldmoveto = moveto
         if self.grid[moveto[0]][moveto[1]] == 1:
             moveto = coords
 
+        #print(action, coords, self.grid[oldmoveto[0]][oldmoveto[1]], oldmoveto, self.grid[moveto[0]][moveto[1]], moveto)
         #print(action, coords, moveto)
+
         reward = self.rewards[moveto[0]][moveto[1]]
         self.current_state = self._state_map[moveto]
 
         return action, reward, self.current_state
 
+def test():
 
-def play(strategy, iterations=1000):
-    strategy.valid_actions = GridWorld.ACTIONS
-
-    g = [[0, 0, 0, -1],
+    G = [[0, 0, 0, -1],
          [0, 1, 0, -1],
          [0, 0, 0, 0]]
 
-    r = [[-0.04, -0.04, -0.04, 10],
+    R = [[-0.04, -0.04, -0.04, 10],
          [-0.04, -0.04, -0.04, -10],
          [-0.04, -0.04, -0.04, -0.04]]
 
-    mygrid = GridWorld(g, r, 0.2)
+    # Move to the right 3 times
+    mygrid = GridWorld(G, R, 0.2)
+    for i in range(3):
+        a, r, s = mygrid.take_action(1)
+        print(a, r, s)
+
+
+def play(strategy, iterations=1000, converge=False, max_steps_per_game=1000):
+    strategy.valid_actions = GridWorld.ACTIONS
+
+    G = [[0, 0, 0, -1],
+         [0, 1, 0, -1],
+         [0, 0, 0, 0]]
+
+    R = [[-0.04, -0.04, -0.04, 10],
+         [-0.04, -0.04, -0.04, -10],
+         [-0.04, -0.04, -0.04, -0.04]]
+
+    mygrid = GridWorld(G, R, 0.2)
     strategy.fit((0, 0, 0))
 
     count = 0
+    steps = 0
     while count < iterations:
         action = strategy.policy(mygrid.current_state)
         try:
             a, r, s = mygrid.take_action(action)
             strategy.fit((s, a, r))
+            steps += 1
+
+            if steps > max_steps_per_game:
+                raise RuntimeError('Maximum number of steps reached')
 
         except RuntimeError:
             count += 1
@@ -77,24 +101,38 @@ def play(strategy, iterations=1000):
             strategy.init_episode() 
             strategy.fit((0, 0, 0))
 
+    if converge:
+        strategy.converge()
+
     action_names = {0: '<', 1: '>', 2: '^', 3: 'v'}
 
     print('')
-    for i in range(len(g)):
+    for i in range(len(G)):
         row = ''
-        for j in range(len(g[i])):
+        for j in range(len(G[i])):
             s = mygrid._state_map[(i,j)]
-            o = action_names.get(strategy.policy(s)) if g[i][j] == 0 else str(g[i][j])
+            o = action_names.get(strategy._greedy_policy(s)) if G[i][j] == 0 else str(G[i][j])
             row += o + '\t'
         print(row)
 
     for a in GridWorld.ACTIONS:
         print('')
         print('Action: %s' % action_names.get(a))
-        for i in range(len(g)):
+        for i in range(len(G)):
             row = ''
-            for j in range(len(g[i])):
+            for j in range(len(G[i])):
                 s = mygrid._state_map[(i,j)]
-                o = '%.3f' % strategy.learner.val(s, a) if g[i][j] == 0 else str(g[i][j])
+                o = '%.3f' % strategy.learner.val(s, a) if G[i][j] == 0 else str(G[i][j])
                 row += o + '\t'
             print(row)
+
+        if hasattr(strategy, '_transition_count'):
+            print('')
+            print('Action count: %s' % action_names.get(a))
+            for i in range(len(G)):
+                row = ''
+                for j in range(len(G[i])):
+                    s = mygrid._state_map[(i,j)]
+                    o = '%d' % strategy._transition_count.get((s, a), 0)
+                    row += o + '\t'
+                print(row)

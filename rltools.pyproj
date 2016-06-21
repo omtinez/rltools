@@ -57,6 +57,8 @@
     <Compile Include="rltools\domains\__init__.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="rltools\learners\learner.py" />
+    <Compile Include="rltools\learners\mlmpd.py" />
     <Compile Include="rltools\learners\temporaldifference.py">
       <SubType>Code</SubType>
     </Compile>
@@ -64,6 +66,8 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="rltools\rltools.py" />
+    <Compile Include="rltools\strategies\strategy.py" />
+    <Compile Include="rltools\strategies\rmax.py" />
     <Compile Include="rltools\strategies\epsilongreedy.py">
       <SubType>Code</SubType>
     </Compile>
@@ -72,7 +76,9 @@
     </Compile>
     <Compile Include="rltools\__init__.py" />
     <Compile Include="setup.py" />
+    <Compile Include="tests\test_learner.py" />
     <Compile Include="tests\test_epsilongreedy.py" />
+    <Compile Include="tests\test_mlmpd.py" />
     <Compile Include="tests\test_temporaldifference.py" />
     <Compile Include="tests\__init__.py" />
   </ItemGroup>

@@ -19,11 +19,11 @@ class RandomWalk(object):
         else:
             self.current_state -= 1
 
-        reward = 1 if self.current_state == self.num_states else 0
+        reward = 1 if self.current_state == self.num_states - 1 else 0
         return action, reward, self.current_state
 
 
-def play(strategy, iterations=1000):
+def play(strategy, iterations=100, converge=False):
     strategy.valid_actions = RandomWalk.ACTIONS
     mydomain = RandomWalk()
     strategy.fit((0, 0, 0))
@@ -41,6 +41,14 @@ def play(strategy, iterations=1000):
             strategy.init_episode() 
             strategy.fit((0, 0, 0))
 
+    if converge:
+        strategy.converge(max_time=60)
+
+    true_prob = [1/6, 1/3, 1/2, 2/3, 5/6]
     print('Estimated probabilities:', ['%.5f' % strategy.learner.val(i, 0) for i in range(1,6)])
-    print('Expected probabilities:', ['%.5f' % x for x in [1/6, 1/3, 1/2, 2/3, 5/6]])
+    print('Expected probabilities:', ['%.5f' % p for p in true_prob])
+
+    rmse = sum([(strategy.learner.val(i, 0) - true_prob[i-1]) ** 2 for i in range(1,6)]) / len(true_prob)
+    print('RMSE:', rmse)
+    return rmse
 

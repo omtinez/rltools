@@ -12,51 +12,27 @@ import unittest2
 import random
 import os
 
+from .test_learner import TestLearner
 from rltools.learners import TemporalDifferenceLearner
+from rltools.strategies import Strategy
+from rltools.domains import randomwalk
 
-
-class TestTemporalDifferenceLearner(unittest2.TestCase):
+class TestTemporalDifferenceLearner(TestLearner):
 
 
     def setUp(self):
-        pass
+        self.cls = TemporalDifferenceLearner
 
 
     def tearDown(self):
         pass
 
 
-    def test_000_interface(self):
-        td = TemporalDifferenceLearner()
-        tup = (0, 0, 0)
-        td.fit(tup)
-        td.fit([tup])
-        td.fit([tup for i in range(10)])
-
-
-    def test_001_fit_incrementally(self):
-
-        # Fitting an entire episode at once:
-        td1 = TemporalDifferenceLearner()
-        td1.fit([(0, 0, 0), (1, 0, 0.1), (2, 0, 0.5), (3, 0, -1)])
-        
-        # Is equivalent to fitting each transition within the episode separately:
-        td2 = TemporalDifferenceLearner()
-        td2.fit((0, 0, 0))
-        td2.fit((1, 0, 0.1))
-        td2.fit((2, 0, 0.5))
-        td2.fit((3, 0, -1))
-        
-        self.assertTrue(all([td1.val(i, 0) == td2.val(i, 0) for i in range(4)]))
-
-
-    def test_002_td_0(self):
+    def test_000_td_0(self):
         u = [random.random(), random.random(), random.random(), random.random()]
         r = [0, random.random(), random.random(), random.random()]
-        td = TemporalDifferenceLearner()
-        td._gamma = random.random()
+        td = TemporalDifferenceLearner(learning_rate=random.random())
         td._lambda = 0
-        td._alpha = lambda x: 1
     
         # Set initial values
         for i in range(len(u)):
@@ -66,9 +42,9 @@ class TestTemporalDifferenceLearner(unittest2.TestCase):
         td.fit([(i, 0, r[i]) for i in range(len(r))])
         
         s = [
-            u[0] + td._alpha(1) * (r[1] + td._gamma * u[1] - u[0]),
-            u[1] + td._alpha(1) * (r[2] + td._gamma * u[2] - u[1]),
-            u[2] + td._alpha(1) * (r[3] + td._gamma * u[3] - u[2]),
+            u[0] + td._learning_rate * (r[1] + td._discount_factor * u[1] - u[0]),
+            u[1] + td._learning_rate * (r[2] + td._discount_factor * u[2] - u[1]),
+            u[2] + td._learning_rate * (r[3] + td._discount_factor * u[3] - u[2]),
             u[3]
         ]
     
@@ -76,13 +52,11 @@ class TestTemporalDifferenceLearner(unittest2.TestCase):
             self.assertAlmostEqual(s[i], td.val(i, 0))
 
 
-    def test_003_td_1(self):
+    def test_001_td_1(self):
         u = [random.random(), random.random(), random.random(), random.random()]
         r = [0, random.random(), random.random(), random.random()]
-        td = TemporalDifferenceLearner()
-        td._gamma = random.random()
+        td = TemporalDifferenceLearner(learning_rate=random.random())
         td._lambda = 1
-        td._alpha = lambda x: 1
     
         # Set initial values
         for i in range(len(u)):
@@ -92,9 +66,9 @@ class TestTemporalDifferenceLearner(unittest2.TestCase):
         td.fit([(i, 0, r[i]) for i in range(len(r))])
         
         s = [
-            u[0] + td._alpha(1) * (r[1] + td._gamma * r[2] + td._gamma ** 2 * r[3] + td._gamma ** 3 * u[3] - u[0]),
-            u[1] + td._alpha(1) * (r[2] + td._gamma * r[3] + td._gamma ** 2 * u[3] - u[1]),
-            u[2] + td._alpha(1) * (r[3] + td._gamma * u[3] - u[2]),
+            u[0] + td._learning_rate * (r[1] + td._discount_factor * r[2] + td._discount_factor ** 2 * r[3] + td._discount_factor ** 3 * u[3] - u[0]),
+            u[1] + td._learning_rate * (r[2] + td._discount_factor * r[3] + td._discount_factor ** 2 * u[3] - u[1]),
+            u[2] + td._learning_rate * (r[3] + td._discount_factor * u[3] - u[2]),
             u[3]
         ]
     
@@ -103,7 +77,7 @@ class TestTemporalDifferenceLearner(unittest2.TestCase):
 
 
     @unittest2.skipIf("TRAVIS" in os.environ and os.environ["TRAVIS"], "Skipping this test on Travis CI.")
-    def test_004_td_converge_stockastic(self):
+    def test_002_td_converge_stockastic(self):
     
         r = [7.9,-5.1,2.5,-7.2,9.0,0.0,1.6]
         u = [0.0,4.0,25.7,0.0,20.1,12.2,0.0]
@@ -117,10 +91,8 @@ class TestTemporalDifferenceLearner(unittest2.TestCase):
             state_zero_values = []
             for l in [1, 0]:
         
-                td = TemporalDifferenceLearner()
-                td._gamma = 1
+                td = TemporalDifferenceLearner(learning_rate=1, discount_factor=1)
                 td._lambda = l
-                td._alpha = lambda x: 1
 
                 for i in range(len(u)):
                     td._set_value(i, 0, u[i])
@@ -141,6 +113,12 @@ class TestTemporalDifferenceLearner(unittest2.TestCase):
             if diff < atol: break
 
         self.assertAlmostEqual(state_zero_values[0], state_zero_values[1])
+
+
+    def test_003_play_random_walk(self):
+        agent = Strategy(TemporalDifferenceLearner())
+        rmse = randomwalk.play(agent)
+        self.assertLess(rmse, 0.1)
 
 
 if __name__ == '__main__':
