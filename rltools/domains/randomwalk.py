@@ -44,7 +44,7 @@ def play(strategy, iterations=100, converge=False):
     if converge:
         strategy.converge(max_time=60)
 
-    true_prob = [1/6, 1/3, 1/2, 2/3, 5/6]
+    true_prob = [1./6, 1./3, 1./2, 2./3, 5./6]
     print('Estimated probabilities:', ['%.5f' % strategy.learner.val(i, 0) for i in range(1,6)])
     print('Expected probabilities:', ['%.5f' % p for p in true_prob])
 
