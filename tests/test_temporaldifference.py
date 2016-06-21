@@ -118,7 +118,7 @@ class TestTemporalDifferenceLearner(TestLearner):
     def test_003_play_random_walk(self):
         agent = Strategy(TemporalDifferenceLearner(l=0))
         rmse = randomwalk.play(agent)
-        self.assertLess(rmse, 0.2)
+        self.assertLess(rmse, 0.1)
 
 
 if __name__ == '__main__':

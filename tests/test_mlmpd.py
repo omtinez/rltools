@@ -75,7 +75,7 @@ class TestMLMDP(TestLearner):
     def test_004_play_random_walk(self):
         agent = Strategy(MLMDP())
         rmse = randomwalk.play(agent, converge=True)
-        self.assertLess(rmse, 0.2)
+        self.assertLess(rmse, 0.1)
 
 
 if __name__ == '__main__':

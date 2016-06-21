@@ -4,7 +4,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectHome />
-    <StartupFile>rltools\rltools.py</StartupFile>
+    <StartupFile>rltools.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -46,7 +46,6 @@
     <Content Include="requirements.txt" />
     <Content Include="requirements_dev.txt" />
     <Content Include="setup.cfg" />
-    <Content Include="tox.ini" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="docs\conf.py" />
@@ -65,7 +64,7 @@
     <Compile Include="rltools\learners\__init__.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="rltools\rltools.py" />
+    <Compile Include="rltools.py" />
     <Compile Include="rltools\strategies\strategy.py" />
     <Compile Include="rltools\strategies\rmax.py" />
     <Compile Include="rltools\strategies\epsilongreedy.py">

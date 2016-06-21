@@ -168,7 +168,7 @@ class Learner(object):
                 for s1 in range(n_states):
                     V[a, s1] = (T[a, s1] * R[a, s1]).sum()
                     for s2 in range(n_states):
-                        V[a, s1] += T[a, s1, s2] * self._learning_rate * V_prev[a, s2]
+                        V[a, s1] += T[a, s1, s2] * self._discount_factor * V_prev[a, s2]
 
             if ((V_prev - V) ** 2).mean() < atol or (max_time > 0 and stopwatch < time.time()):
                 break
