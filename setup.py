@@ -23,7 +23,7 @@ test_requirements = [
 
 setup(
     name='rltools',
-    version='0.2.0',
+    version='0.2.1',
     description="Collection of domains, learners, strategies, and other tools related to reinforcement learning.",
     long_description=readme + '\n\n' + history,
     author="Oscar Martinez",
