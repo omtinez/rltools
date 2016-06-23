@@ -31,6 +31,9 @@ setup(
     url='https://github.com/omtinez/rltools',
     packages=[
         'rltools',
+        'rltools.domains',
+        'rltools.learners',
+        'rltools.strategies',
     ],
     package_dir={'rltools':
                  'rltools'},
