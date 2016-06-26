@@ -33,17 +33,20 @@ class TemporalDifferenceLearner(Learner):
             self.init_episode()
         self._episode_list[-1].append((prev_state, action, reward, curr_state, 1))
 
-        # For the previous state, compute value as the max of values for all possible actions
-        prev_state_val = max([self.val(prev_state, a) for a in self._all_actions])
+        # For this state, compute value as the max of values for all possible actions
+        estimated_value = max([self.val(prev_state, a) for a in self._all_actions])
+
+        # Keep track of the value estimate based on prior iterations
+        previous_value = self._prev_values.get((curr_state, action), 0)
 
         # Compute the value added to each of the states
-        delta = reward + (self._discount_factor * self._prev_values.get((curr_state, action), 0) \
-            - prev_state_val)
+        delta = reward + self._discount_factor * previous_value - estimated_value
         value = self._learning_rate * delta
 
         for ix, vec in enumerate(self._episode_list[-1]):
             state_, action_, _, _, eligibility = vec
-            self._update_value(state_, action_, value * eligibility)  # update value
+            self._set_value(state_, action_, value * eligibility \
+                + self.val(state_, action_))  # update value in additive way
             self._episode_list[-1][ix] = vec[:-1] + (vec[-1] * self._discount_factor * \
                 self._lambda,)  # decay eligibility
 

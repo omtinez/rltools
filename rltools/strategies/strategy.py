@@ -7,8 +7,12 @@ class Strategy(object):
         self.valid_actions = valid_actions or []
 
 
-    def fit(self, X):  # pylint: disable=invalid-name
-        self.learner.fit(X)
+    def _learn_incr(self, *args, **kwargs):  # pylint: disable=invalid-name
+        self.learner._learn_incr(*args, **kwargs)
+
+
+    def fit(self, *args, **kwargs):  # pylint: disable=invalid-name
+        self.learner.fit(*args, **kwargs)
 
 
     def init_episode(self, *args, **kwargs):
@@ -31,12 +35,16 @@ class Strategy(object):
         valid_actions = self._parse_valid_actions(valid_actions)
         value_fn = value_fn or self.learner.val
 
+        # Early exit: no valid actions exist
+        if len(valid_actions) == 0:
+            raise ValueError('No valid actions exist for the policy to choose')
+
         # Pick the action with highest value
         action_values = [(value_fn(state, action), action) for action in valid_actions]
         sorted_values = sorted(action_values, key=lambda x: -x[0])
 
         # In case of a tie, choose randomly
-        atol = 1E-3
+        atol = 1E-5
         equal_values = [v for v in sorted_values if abs(v[0] - sorted_values[0][0]) < atol]
         return equal_values[random.randint(0, len(equal_values) - 1)][1]
 

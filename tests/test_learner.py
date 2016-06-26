@@ -36,11 +36,11 @@ class TestLearner(unittest2.TestCase):
 
 
     def test_001_update_value(self):
-        learner = self.cls(discount_factor=random.random(), learning_rate=random.random())
-        learner._update_value(0, 0, 1)
+        learner = self.cls(discount_factor=random.random(), learning_rate=0.5)
+        learner._set_value(0, 0, 1)
         self.assertEqual(learner.val(0, 0), 1)
-        learner._update_value(0, 0, 1)
-        self.assertEqual(learner.val(0, 0), 2)
+        learner._update_value(0, 0, 2)
+        self.assertEqual(learner.val(0, 0), 1.5)
 
 
     def test_002_update_sets(self):

@@ -27,10 +27,14 @@ class Learner(object):
 
 
     def _update_value(self, state, action, val):
-        ''' Helper method to add/subtract value estimated for specific <state, action> '''
+        '''
+        Helper method to add/subtract value estimated for specific <state, action> using the
+        current learning rate
+        '''
         self._all_states.add(state)
         self._all_actions.add(action)
-        self._values[(state, action)] = val + self._values.get((state, action), 0)
+        self._values[(state, action)] = val * self._learning_rate + \
+            (1.0 - self._learning_rate) * self._values.get((state, action), 0)
 
 
     def _copy_values(self):
@@ -65,7 +69,7 @@ class Learner(object):
         return self._values.get((state, action), 0)
 
 
-    def init_episode(self):
+    def init_episode(self, init_state=None):
         '''
         Called after a terminal state is reached and a new episode is started. This method is
         automatically called when the first observation is recorded using `fit()` or an observation
@@ -94,7 +98,7 @@ class Learner(object):
         '''
         self._curr_episode += 1
         self._learning_rate = self._learning_discount ** self._curr_episode
-        self._last_state = None
+        self._last_state = init_state
 
 
     def fit(self, X):  # pylint: disable=invalid-name
@@ -179,7 +183,7 @@ class Learner(object):
 
         return curr_values
 
-    def converge(self, atol=1E-3, max_iter=1000, max_time=0):
+    def converge(self, atol=1E-5, max_iter=1000, max_time=0):
         ''' Train over already fitted data over and over until convergence '''
         raise NotImplementedError(
             'Classes inhereting from Learner must override Learner.converge()')

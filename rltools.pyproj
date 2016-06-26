@@ -57,6 +57,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="rltools\learners\learner.py" />
+    <Compile Include="rltools\learners\qlearner.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="rltools\learners\valuefunctionapprox.py" />
     <Compile Include="rltools\learners\mlmpd.py" />
     <Compile Include="rltools\learners\temporaldifference.py">
       <SubType>Code</SubType>
