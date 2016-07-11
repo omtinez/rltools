@@ -52,7 +52,7 @@ class Learner(object):
     def val(self, state, action):
         '''
         Retrieves the estimated value of taking an `action` from this `state`, or zero if this
-        <state, action> has never been encountered before.
+        <state, action> has no learned value.
 
         Parameters
         ----------

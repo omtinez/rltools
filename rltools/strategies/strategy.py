@@ -49,6 +49,5 @@ class Strategy(object):
         return equal_values[random.randint(0, len(equal_values) - 1)][1]
 
 
-
     def policy(self, state, valid_actions=None):
         return self._greedy_policy(state, valid_actions)
